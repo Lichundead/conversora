@@ -1,7 +1,6 @@
 from tkinter import ttk, messagebox
-import logging
-
 from . import logica
+
 
 class CalculadoraDineroCOP:
 
@@ -94,7 +93,8 @@ class CalculadoraDineroCOP:
     def _programar_actualizacion(self, _event=None):
         if self._job_id_debounce is not None:
             self.root.after_cancel(self._job_id_debounce)
-        self._job_id_debounce = self.root.after(self.DEBOUNCE_MS, self._actualizar_total)
+        self._job_id_debounce = self.root.after(
+            self.DEBOUNCE_MS, self._actualizar_total)
 
     def _actualizar_total(self):
         self._job_id_debounce = None
@@ -105,10 +105,11 @@ class CalculadoraDineroCOP:
             }
             total = logica.calcular_total(entradas)
             texto = self.TEXTO_TOTAL_FORMAT.format(total).replace(',', '.')
-            self.resultado_label.config(text=texto, foreground=self.COLOR_RESULTADO_OK)
-        except Exception as e:
-            logging.error("Error en _actualizar_total: %s", e)
-            messagebox.showerror("Error de Cálculo", f"Ocurrió un error al calcular el total:\n{e}")
+            self.resultado_label.config(
+                text=texto, foreground=self.COLOR_RESULTADO_OK)
+        except TypeError as e:
+            messagebox.showerror(
+                "Error de Cálculo", f"Ocurrió un error al calcular el total:\n{e}")
             self.resultado_label.config(
                 text=self.TEXTO_TOTAL_ERROR,
                 foreground=self.COLOR_RESULTADO_ERROR,
