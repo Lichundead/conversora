@@ -44,7 +44,7 @@ class CalculadoraDineroCOP:
         self._crear_interfaz()
 
     def _validate_input(self, P):
-        return P == "" or P.isdigit()
+        return P == "" or P.isdecimal()
 
     def _crear_interfaz(self):
         main_frame = ttk.Frame(self.root, padding=20)
