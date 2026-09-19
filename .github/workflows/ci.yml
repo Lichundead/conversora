@@ -1,16 +1,19 @@
 name: CI
 
+# Las ramas se verifican por el evento pull_request, no por push. Si se
+# escucharan los dos, un push a una rama con PR abierto lanzaría dos tandas
+# sobre el mismo commit; cancelar una dejaría once checks en 'cancelled'
+# colgados del commit y el PR en estado 'unstable' para siempre.
+# Para verificar una rama antes de abrir el PR está workflow_dispatch.
 on:
   push:
-    branches: ["main", "claude/**"]
+    branches: ["main"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
 
-# Un push a una rama con PR abierto dispara dos eventos (push y
-# pull_request) sobre el mismo commit. Al normalizar el nombre de la rama
-# -head_ref en el PR, ref_name en el push- ambos caen en el mismo grupo y
-# solo sobrevive la tanda más reciente, en vez de duplicar los 11 jobs.
+# Un push nuevo al mismo PR o rama descarta la tanda anterior, que ya está
+# obsoleta. head_ref identifica la rama en un PR; ref_name, en un push.
 concurrency:
   group: ci-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
