@@ -74,6 +74,35 @@ jobs:
           ditto -c -k --keepParent
           dist/CalculadoraDineroCOP.app CalculadoraDineroCOP-macos.zip
 
+      # Que el empaquetado no falle no prueba que el contenido sirva. Estas
+      # comprobaciones fallan la build si se pierde el bit de ejecución o si
+      # el .app no tiene la estructura que macOS necesita para arrancarlo.
+      - name: Comprobar el paquete de Linux
+        if: runner.os == 'Linux'
+        run: |
+          tar -tvzf CalculadoraDineroCOP-linux.tar.gz
+          modo=$(tar -tvzf CalculadoraDineroCOP-linux.tar.gz \
+                 | awk '$NF == "CalculadoraDineroCOP" {print $1}')
+          echo "Modo del binario en el tar: $modo"
+          case "$modo" in
+            *x*) echo "Conserva el bit de ejecución" ;;
+            *)   echo "ERROR: el binario no es ejecutable dentro del tar"; exit 1 ;;
+          esac
+
+      - name: Comprobar el paquete de macOS
+        if: runner.os == 'macOS'
+        run: |
+          binario=CalculadoraDineroCOP.app/Contents/MacOS/CalculadoraDineroCOP
+          unzip -l CalculadoraDineroCOP-macos.zip | head -20
+          for esperado in \
+              "CalculadoraDineroCOP.app/Contents/Info.plist" \
+              "$binario"; do
+            if ! unzip -l CalculadoraDineroCOP-macos.zip | grep -q "$esperado"; then
+              echo "ERROR: falta $esperado en el .app"; exit 1
+            fi
+          done
+          echo "El .app tiene Info.plist y su ejecutable en Contents/MacOS"
+
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artefacto }}
