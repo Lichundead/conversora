@@ -70,6 +70,17 @@ pyinstaller --onefile --windowed --name CalculadoraDineroCOP main.py
   adjuntos. Una etiqueta no dispara `ci.yml` por sí sola, así que sin ese paso
   una versión se podría publicar desde un commit sin verificar.
 
+Formato de cada entrega:
+
+| Plataforma | Asset | Por qué |
+|---|---|---|
+| Windows | `.exe` suelto | No hay bit de ejecución que preservar |
+| Linux | `.tar.gz` | Un asset suelto se descarga sin permiso de ejecución |
+| macOS | `.zip` con el `.app` | Es la forma en que macOS espera una aplicación |
+
+Los binarios no están firmados, así que Gatekeeper y SmartScreen avisarán al
+abrirlos. El de macOS es solo para Apple Silicon (arm64).
+
 Para publicar una versión:
 
 ```bash
