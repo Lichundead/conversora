@@ -1,0 +1,3 @@
+# Herramientas de desarrollo y CI. La aplicación en sí no tiene dependencias
+# externas: solo la biblioteca estándar (tkinter).
+ruff==0.14.2

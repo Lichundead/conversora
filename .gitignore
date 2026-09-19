@@ -1,12 +1,10 @@
+# Bytecode y cachés de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-tests/
-
-*.spec
-
+# Entornos virtuales
 .venv/
 venv/
 ENV/
@@ -14,29 +12,14 @@ env/
 env.bak/
 venv.bak/
 
-
+# Logs y bases de datos locales
 *.log
 logs/
-
-
 *.db
 *.sqlite3
 
-
-.DS_Store
-
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-.idea/           # PyCharm, IntelliJ IDEA
-.vscode/         # Visual Studio Code
-*.sublime-project
-*.sublime-workspace
-nbproject/       # NetBeans
-*.swp            # Vim swap files
-
-
+# Empaquetado / PyInstaller
+*.spec
 build/
 dist/
 downloads/
@@ -46,12 +29,13 @@ eggs/
 wheels/
 *.whl
 
-
+# Variables de entorno
 .env
 .env.*
-!.env.example  # A menudo se incluye un ejemplo no sensible
+# A menudo se incluye un ejemplo no sensible
+!.env.example
 
-
+# Pruebas y cobertura
 .pytest_cache/
 .coverage
 .coverage.*
@@ -59,10 +43,23 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
+# Editores e IDEs
+# PyCharm, IntelliJ IDEA
+.idea/
+# Visual Studio Code
+.vscode/
+*.sublime-project
+*.sublime-workspace
+# NetBeans
+nbproject/
+# Vim swap files
+*.swp
 
+# Sistema operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Notebooks
 .ipynb_checkpoints
-
-
-# /temp/
-# /tmp/
-
