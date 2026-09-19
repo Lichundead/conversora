@@ -29,10 +29,10 @@ jobs:
             binario: dist/CalculadoraDineroCOP.exe
           - os: ubuntu-latest
             artefacto: CalculadoraDineroCOP-linux
-            binario: dist/CalculadoraDineroCOP
+            binario: CalculadoraDineroCOP-linux.tar.gz
           - os: macos-latest
             artefacto: CalculadoraDineroCOP-macos
-            binario: dist/CalculadoraDineroCOP
+            binario: CalculadoraDineroCOP-macos.zip
     steps:
       - uses: actions/checkout@v7
 
@@ -43,10 +43,65 @@ jobs:
       - name: Instalar PyInstaller
         run: pip install pyinstaller
 
-      - name: Construir ejecutable
+      - name: Construir ejecutable (Windows y Linux)
+        if: runner.os != 'macOS'
         run: >
           pyinstaller --onefile --windowed --clean --noconfirm
           --name CalculadoraDineroCOP main.py
+
+      # En macOS, --onefile junto a --windowed está deprecado: un paquete .app
+      # no puede ser un solo fichero, choca con la seguridad del sistema y
+      # PyInstaller avisa de que será un error en su versión 7. Con --onedir
+      # se obtiene el .app, que es la forma en que macOS espera una app.
+      - name: Construir paquete .app (macOS)
+        if: runner.os == 'macOS'
+        run: >
+          pyinstaller --onedir --windowed --clean --noconfirm
+          --name CalculadoraDineroCOP main.py
+
+      # Los assets de una release son blobs planos: no conservan el modo
+      # POSIX, así que un binario subido en crudo se descarga sin permiso de
+      # ejecución y no arranca hasta hacerle chmod +x. En Windows no aplica,
+      # pero en Linux y macOS hay que empaquetar. En macOS se usa ditto, que
+      # es lo que conserva la estructura y los permisos de un .app.
+      - name: Empaquetar para distribución (Linux)
+        if: runner.os == 'Linux'
+        run: tar -czf CalculadoraDineroCOP-linux.tar.gz -C dist CalculadoraDineroCOP
+
+      - name: Empaquetar para distribución (macOS)
+        if: runner.os == 'macOS'
+        run: >
+          ditto -c -k --keepParent
+          dist/CalculadoraDineroCOP.app CalculadoraDineroCOP-macos.zip
+
+      # Que el empaquetado no falle no prueba que el contenido sirva. Estas
+      # comprobaciones fallan la build si se pierde el bit de ejecución o si
+      # el .app no tiene la estructura que macOS necesita para arrancarlo.
+      - name: Comprobar el paquete de Linux
+        if: runner.os == 'Linux'
+        run: |
+          tar -tvzf CalculadoraDineroCOP-linux.tar.gz
+          modo=$(tar -tvzf CalculadoraDineroCOP-linux.tar.gz \
+                 | awk '$NF == "CalculadoraDineroCOP" {print $1}')
+          echo "Modo del binario en el tar: $modo"
+          case "$modo" in
+            *x*) echo "Conserva el bit de ejecución" ;;
+            *)   echo "ERROR: el binario no es ejecutable dentro del tar"; exit 1 ;;
+          esac
+
+      - name: Comprobar el paquete de macOS
+        if: runner.os == 'macOS'
+        run: |
+          binario=CalculadoraDineroCOP.app/Contents/MacOS/CalculadoraDineroCOP
+          unzip -l CalculadoraDineroCOP-macos.zip | head -20
+          for esperado in \
+              "CalculadoraDineroCOP.app/Contents/Info.plist" \
+              "$binario"; do
+            if ! unzip -l CalculadoraDineroCOP-macos.zip | grep -q "$esperado"; then
+              echo "ERROR: falta $esperado en el .app"; exit 1
+            fi
+          done
+          echo "El .app tiene Info.plist y su ejecutable en Contents/MacOS"
 
       - uses: actions/upload-artifact@v7
         with:
@@ -74,10 +129,10 @@ jobs:
           mkdir -p entrega
           mv artefactos/CalculadoraDineroCOP-windows/CalculadoraDineroCOP.exe \
              "entrega/CalculadoraDineroCOP-${GITHUB_REF_NAME}-windows.exe"
-          mv artefactos/CalculadoraDineroCOP-linux/CalculadoraDineroCOP \
-             "entrega/CalculadoraDineroCOP-${GITHUB_REF_NAME}-linux"
-          mv artefactos/CalculadoraDineroCOP-macos/CalculadoraDineroCOP \
-             "entrega/CalculadoraDineroCOP-${GITHUB_REF_NAME}-macos"
+          mv artefactos/CalculadoraDineroCOP-linux/CalculadoraDineroCOP-linux.tar.gz \
+             "entrega/CalculadoraDineroCOP-${GITHUB_REF_NAME}-linux.tar.gz"
+          mv artefactos/CalculadoraDineroCOP-macos/CalculadoraDineroCOP-macos.zip \
+             "entrega/CalculadoraDineroCOP-${GITHUB_REF_NAME}-macos.zip"
           ls -la entrega
 
       - name: Crear la release en GitHub
