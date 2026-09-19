@@ -11,6 +11,9 @@ on:
   pull_request:
     branches: ["main"]
   workflow_dispatch:
+  # Permite que release.yml exija esta misma verificación antes de publicar,
+  # en vez de mantener una copia de la matriz de pruebas.
+  workflow_call:
 
 # Un push nuevo al mismo PR o rama descarta la tanda anterior, que ya está
 # obsoleta. head_ref identifica la rama en un PR; ref_name, en un push.
