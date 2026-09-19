@@ -65,8 +65,10 @@ pyinstaller --onefile --windowed --name CalculadoraDineroCOP main.py
   comprueba que el ejecutable se puede construir. Para lanzarlo a mano sobre
   una rama sin PR, usa el botón *Run workflow* (`workflow_dispatch`).
 - **Release** (`.github/workflows/release.yml`): al empujar una etiqueta `v*`
-  construye los binarios de las tres plataformas y publica una release de
-  GitHub con ellos adjuntos.
+  ejecuta primero el workflow de CI completo y, solo si pasa, construye los
+  binarios de las tres plataformas y publica una release de GitHub con ellos
+  adjuntos. Una etiqueta no dispara `ci.yml` por sí sola, así que sin ese paso
+  una versión se podría publicar desde un commit sin verificar.
 
 Para publicar una versión:
 

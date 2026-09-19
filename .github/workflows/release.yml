@@ -9,8 +9,16 @@ permissions:
   contents: write
 
 jobs:
+  # Una etiqueta no dispara ci.yml, así que sin esto una versión se podría
+  # publicar desde un commit que nunca pasó las pruebas. Se invoca el mismo
+  # workflow de CI en vez de duplicar aquí la matriz.
+  verificar:
+    name: Verificar
+    uses: ./.github/workflows/ci.yml
+
   build:
     name: Empaquetar (${{ matrix.os }})
+    needs: verificar
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
