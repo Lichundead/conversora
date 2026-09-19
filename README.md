@@ -60,8 +60,7 @@ pyinstaller --onefile --windowed --name CalculadoraDineroCOP main.py
 ## CI/CD
 
 - **CI** (`.github/workflows/ci.yml`): en cada pull request y en cada push a
-  `main` corre `ruff`,
-  la suite de pruebas en Linux, Windows y macOS sobre Python 3.11–3.13, y
+  `main` corre `ruff`, la suite de pruebas en Linux, Windows y macOS, y
   comprueba que el ejecutable se puede construir. Para lanzarlo a mano sobre
   una rama sin PR, usa el botón *Run workflow* (`workflow_dispatch`).
 - **Release** (`.github/workflows/release.yml`): al empujar una etiqueta `v*`

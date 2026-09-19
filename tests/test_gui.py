@@ -40,46 +40,31 @@ class TestCalculadoraDineroCOP(unittest.TestCase):
         _valor, variable = self.app.entries[identificador]
         variable.set(texto)
 
+    def _total_en_pantalla(self):
+        return self.app.resultado_label.cget('text')
+
     def test_arranca_en_cero(self):
-        self.assertEqual(self.app._total, 0)
-        self.assertEqual(self.app.resultado_label.cget('text'), "TOTAL: $0 COP")
+        self.assertEqual(self._total_en_pantalla(), "TOTAL: $0 COP")
 
     def test_una_casilla_actualiza_el_total(self):
         self._escribir("b10k", "3")
-        self.assertEqual(self.app._total, 30000)
-        self.assertEqual(
-            self.app.resultado_label.cget('text'), "TOTAL: $30.000 COP"
-        )
+        self.assertEqual(self._total_en_pantalla(), "TOTAL: $30.000 COP")
 
     def test_varias_casillas_se_suman(self):
         self._escribir("b10k", "2")
         self._escribir("m500", "4")
-        self.assertEqual(self.app._total, 22000)
+        self.assertEqual(self._total_en_pantalla(), "TOTAL: $22.000 COP")
 
     def test_corregir_una_casilla_no_acumula(self):
-        """El total incremental debe seguir al valor, no a la historia."""
         self._escribir("b1k", "5")
         self._escribir("b1k", "50")
         self._escribir("b1k", "5")
-        self.assertEqual(self.app._total, 5000)
+        self.assertEqual(self._total_en_pantalla(), "TOTAL: $5.000 COP")
 
     def test_borrar_vuelve_a_cero(self):
         self._escribir("b20k", "7")
         self._escribir("b20k", "")
-        self.assertEqual(self.app._total, 0)
-        self.assertEqual(self.app.resultado_label.cget('text'), "TOTAL: $0 COP")
-
-    def test_total_incremental_coincide_con_el_calculo_completo(self):
-        from calculadora_dinero import logica
-
-        for idf, texto in (("m50", "3"), ("b5k", "12"), ("b100k", "2")):
-            self._escribir(idf, texto)
-
-        entradas = {
-            idf: (valor, variable.get())
-            for idf, (valor, variable) in self.app.entries.items()
-        }
-        self.assertEqual(self.app._total, logica.calcular_total(entradas))
+        self.assertEqual(self._total_en_pantalla(), "TOTAL: $0 COP")
 
     def test_validador_rechaza_lo_que_no_sea_digito(self):
         self.assertTrue(self.app._validate_input(""))

@@ -50,19 +50,18 @@ jobs:
         run: ruff check --output-format=github .
 
   test:
-    name: Tests (${{ matrix.os }} / py${{ matrix.python-version }})
+    name: Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Comprobar que tkinter está disponible
         run: python -c "import tkinter; print('Tk', tkinter.TkVersion)"

@@ -1,6 +1,6 @@
 [project]
 name = "calculadora-dinero-cop"
-version = "0.2.0"
+version = "0.3.0"
 description = "Aplicación de escritorio para contar y sumar efectivo en pesos colombianos."
 requires-python = ">=3.11"
 dependencies = []
