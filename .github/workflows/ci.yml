@@ -7,8 +7,12 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# Un push a una rama con PR abierto dispara dos eventos (push y
+# pull_request) sobre el mismo commit. Al normalizar el nombre de la rama
+# -head_ref en el PR, ref_name en el push- ambos caen en el mismo grupo y
+# solo sobrevive la tanda más reciente, en vez de duplicar los 11 jobs.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions:
